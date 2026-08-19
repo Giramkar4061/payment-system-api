@@ -1,0 +1,170 @@
+#%RAML 1.0
+title: Payment System API
+version: v1
+baseUri: /api
+
+mediaType: application/json
+
+types:
+
+  PaymentRequest:
+    type: object
+    properties:
+      orderId:
+        type: string
+        required: true
+        example: "ORD-10001"
+
+      customerId:
+        type: string
+        required: true
+        example: "CUS-1001"
+
+      amount:
+        type: number
+        required: true
+        minimum: 0.01
+        example: 2499.00
+
+      currency:
+        type: string
+        required: true
+        enum:
+          - INR
+          - USD
+          - EUR
+        example: "INR"
+
+      paymentMethod:
+        type: string
+        required: true
+        enum:
+          - CARD
+          - UPI
+          - NET_BANKING
+        example: "CARD"
+
+  PaymentResponse:
+    type: object
+    properties:
+      paymentId:
+        type: string
+        example: "PAY-10001"
+
+      orderId:
+        type: string
+        example: "ORD-10001"
+
+      customerId:
+        type: string
+        example: "CUS-1001"
+
+      amount:
+        type: number
+        example: 2499.00
+
+      currency:
+        type: string
+        example: "INR"
+
+      paymentMethod:
+        type: string
+        example: "CARD"
+
+      status:
+        type: string
+        enum:
+          - SUCCESS
+          - DECLINED
+          - PENDING
+          - FAILED
+        example: "SUCCESS"
+
+      transactionId:
+        type: string
+        example: "TXN-987654"
+
+      message:
+        type: string
+        example: "Payment processed successfully"
+
+  ErrorResponse:
+    type: object
+    properties:
+      errorCode:
+        type: string
+        example: "PAYMENT_DECLINED"
+
+      message:
+        type: string
+        example: "Payment was declined by the payment provider"
+
+      correlationId:
+        type: string
+        example: "8c8a4d2e-1234-4567"
+
+      timestamp:
+        type: datetime
+
+/payments:
+
+  post:
+    description: Process a payment for an order.
+
+    body:
+      application/json:
+        type: PaymentRequest
+
+    responses:
+
+      201:
+        body:
+          application/json:
+            type: PaymentResponse
+
+      400:
+        body:
+          application/json:
+            type: ErrorResponse
+
+      402:
+        body:
+          application/json:
+            type: ErrorResponse
+
+      409:
+        body:
+          application/json:
+            type: ErrorResponse
+
+      500:
+        body:
+          application/json:
+            type: ErrorResponse
+
+      504:
+        body:
+          application/json:
+            type: ErrorResponse
+
+  /{paymentId}:
+
+    get:
+      description: Retrieve payment details.
+
+      responses:
+
+        200:
+          body:
+            application/json:
+              type: PaymentResponse
+
+        404:
+          body:
+            application/json:
+              type: ErrorResponse
+
+        500:
+          body:
+            application/json:
+              type: ErrorResponse
