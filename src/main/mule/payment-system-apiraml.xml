@@ -133,5 +133,27 @@ output application/json
     </flow>
     <flow name="post:\payments:application\json:payment-system-apiraml-config">
         <logger level="INFO" message="post:\payments:application\json:payment-system-apiraml-config" />
+		<ee:transform doc:name="Transform Message" doc:id="3f530419-0433-460b-b954-dd9169bf66fb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+---
+{
+    paymentId: "PAY-" ++ uuid(),
+    orderId: payload.orderId,
+    customerId: payload.customerId,
+    amount: payload.amount,
+    currency: payload.currency,
+    paymentMethod: payload.paymentMethod,
+    status: "SUCCESS",
+    transactionId: "TXN-" ++ uuid(),
+    message: "Payment processed successfully"
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="httpStatus" ><![CDATA[201]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
     </flow>
 </mule>
